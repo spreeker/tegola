@@ -1,0 +1,34 @@
+[webserver]
+port = ":8080"
+
+# register data providers
+[[providers]]
+name = "test_postgis"
+type = "postgis"
+host = "127.0.0.1"
+port = 5432
+database = "predictiveparking"
+user = "predictiveparking"
+password = "insecure"
+
+	[[providers.layers]]
+	name = "vakken" 			# will be encoded as the layer name in the tile
+	tablename = "public.wegdelen_parkeervak" 	# sql or table_name are required
+	geometry_fieldname = "geometrie"		# geom field. default is geom
+	id_fieldname = "gid"			# geom id field. default is gid
+	fields = ["scan_count", "type"]
+	srid = 4326
+
+# maps are made up of layers
+[[maps]]
+name = "vakken"							# used in the URL to reference this map (/maps/:map_name)
+attribution = "<div>Preeker</div>" # map attribution
+center = [4.8, 52.4, 12.0] # optional center value. part of the TileJSON spec
+
+	[[maps.layers]]
+	provider_layer = "test_postgis.vakken"	# must match a data provider layer
+	min_zoom = 0
+	max_zoom = 32
+
+		[maps.layers.default_tags]		# a table of default tags to encode in the tile. SQL statements will override
+		class = "vak"
